@@ -1,0 +1,20 @@
+{
+  "task_id": "task_002_sql_inject",
+  "title": "Add user search endpoint — SQL injection vulnerability",
+  "language": "python",
+  "author": "backend-intern",
+  "pr_description": "Implements a search endpoint that allows finding users by username pattern. Uses direct SQL for performance.",
+  "diff": "diff --git a/db.py b/db.py\nindex aaa1111..bbb2222 100644\n--- a/db.py\n+++ b/db.py\n@@ -18,6 +18,16 @@ def get_user(session, user_id: int):\n     return session.query(User).filter(User.id == user_id).first()\n \n \n+def search_users(session, username: str):\n+    \"\"\"Search users by username pattern.\"\"\"\n+    cursor = session.connection().connection.cursor()\n+    query = f\"SELECT id, username, email FROM users WHERE username LIKE '%{username}%'\"\n+    cursor.execute(query)\n+    rows = cursor.fetchall()\n+    return [\n+        {\"id\": r[0], \"username\": r[1], \"email\": r[2]}\n+        for r in rows\n+    ]\n \n \n def create_user(session, username: str, email: str):\n",
+  "file_context": "import sqlite3\nfrom sqlalchemy import create_engine\nfrom sqlalchemy.orm import Session\nfrom models import User\n\n\ndef get_db_session():\n    engine = create_engine(\"sqlite:///app.db\")\n    return Session(engine)\n\n\ndef get_user(session, user_id: int):\n    return session.query(User).filter(User.id == user_id).first()\n\n\ndef search_users(session, username: str):\n    \"\"\"Search users by username pattern.\"\"\"\n    cursor = session.connection().connection.cursor()\n    query = f\"SELECT id, username, email FROM users WHERE username LIKE '%{username}%'\"\n    cursor.execute(query)\n    rows = cursor.fetchall()\n    return [\n        {\"id\": r[0], \"username\": r[1], \"email\": r[2]}\n        for r in rows\n    ]\n\n\ndef create_user(session, username: str, email: str):\n    user = User(username=username, email=email)\n    session.add(user)\n    session.commit()\n    return user\n",
+  "gold_issues": [
+    {
+      "file": "db.py",
+      "line": 23,
+      "severity": "critical",
+      "category": "security",
+      "description": "SQL injection vulnerability: user input is directly interpolated into SQL query using f-string. Attacker can inject arbitrary SQL via the username parameter."
+    }
+  ],
+  "gold_summary_keywords": ["SQL injection", "f-string", "parameterized", "security", "user input"],
+  "should_approve": false
+}

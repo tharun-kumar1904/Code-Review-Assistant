@@ -1,0 +1,20 @@
+{
+  "task_id": "task_001_null_check",
+  "title": "Add user profile endpoint — missing null check",
+  "language": "python",
+  "author": "junior-dev",
+  "pr_description": "Adds a GET /user/{user_id}/profile endpoint that returns the user's profile information including name and email.",
+  "diff": "diff --git a/app.py b/app.py\nindex 1a2b3c4..5d6e7f8 100644\n--- a/app.py\n+++ b/app.py\n@@ -8,6 +8,18 @@ from database import get_user, get_db_session\n app = FastAPI()\n \n \n+@app.get(\"/user/{user_id}/profile\")\n+async def get_user_profile(user_id: int):\n+    \"\"\"Get user profile by ID.\"\"\"\n+    db = get_db_session()\n+    user = get_user(db, user_id)\n+    return {\n+        \"id\": user.id,\n+        \"name\": user.name,\n+        \"email\": user.email,\n+        \"created_at\": str(user.created_at)\n+    }\n+\n \n @app.get(\"/health\")\n async def health_check():\n",
+  "file_context": "from fastapi import FastAPI, HTTPException\nfrom database import get_user, get_db_session\n\napp = FastAPI()\n\n\n@app.get(\"/user/{user_id}/profile\")\nasync def get_user_profile(user_id: int):\n    \"\"\"Get user profile by ID.\"\"\"\n    db = get_db_session()\n    user = get_user(db, user_id)\n    return {\n        \"id\": user.id,\n        \"name\": user.name,\n        \"email\": user.email,\n        \"created_at\": str(user.created_at)\n    }\n\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"ok\"}\n",
+  "gold_issues": [
+    {
+      "file": "app.py",
+      "line": 15,
+      "severity": "high",
+      "category": "bug",
+      "description": "Missing null check: get_user() may return None if user_id does not exist, causing AttributeError when accessing user.name"
+    }
+  ],
+  "gold_summary_keywords": ["null check", "None", "AttributeError", "user", "get_user"],
+  "should_approve": false
+}

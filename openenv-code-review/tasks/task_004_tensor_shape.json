@@ -1,0 +1,27 @@
+{
+  "task_id": "task_004_tensor_shape",
+  "title": "PyTorch model — tensor shape mismatch and device error",
+  "language": "python",
+  "author": "ml-engineer",
+  "pr_description": "Implements a convolutional image classifier model with adaptive pooling and a fully connected head.",
+  "diff": "diff --git a/model.py b/model.py\nindex eee5555..fff6666 100644\n--- a/model.py\n+++ b/model.py\n@@ -1,4 +1,5 @@\n import torch\n+import torch.nn as nn\n import torch.nn.functional as F\n \n \n@@ -8,12 +9,33 @@ class ImageClassifier(nn.Module):\n     def __init__(self, num_classes=10):\n         super().__init__()\n         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)\n+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)\n+        self.pool = nn.AdaptiveAvgPool2d((2, 2))  # Output: 64 * 2 * 2 = 256\n+        self.fc1 = nn.Linear(512, 128)  # BUG: expects 512 but conv outputs 256\n+        self.fc2 = nn.Linear(128, num_classes)\n         self.num_classes = num_classes\n \n     def forward(self, x):\n         x = F.relu(self.conv1(x))\n+        x = F.relu(self.conv2(x))\n+        x = self.pool(x)\n+        x = x.view(x.size(0), -1)  # Flatten: [batch, 256]\n+        x = F.relu(self.fc1(x))    # Will crash: 256 != 512\n+        x = self.fc2(x)\n         return x\n \n+    def predict_with_default(self, x):\n+        \"\"\"Run prediction, return zeros if batch is empty.\"\"\"\n+        if x.size(0) == 0:\n+            return torch.zeros(0, self.num_classes)  # BUG: no device specified\n+        logits = self.forward(x)\n+        return F.softmax(logits, dim=1)\n+\n \n class Trainer:\n     def __init__(self, model, optimizer):\n",
+  "file_context": "import torch\nimport torch.nn as nn\nimport torch.nn.functional as F\n\n\nclass ImageClassifier(nn.Module):\n    \"\"\"Simple CNN image classifier.\"\"\"\n\n    def __init__(self, num_classes=10):\n        super().__init__()\n        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)\n        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)\n        self.pool = nn.AdaptiveAvgPool2d((2, 2))  # Output: 64 * 2 * 2 = 256\n        self.fc1 = nn.Linear(512, 128)  # BUG: expects 512 but conv outputs 256\n        self.fc2 = nn.Linear(128, num_classes)\n        self.num_classes = num_classes\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        x = F.relu(self.conv2(x))\n        x = self.pool(x)\n        x = x.view(x.size(0), -1)  # Flatten: [batch, 256]\n        x = F.relu(self.fc1(x))    # Will crash: 256 != 512\n        x = self.fc2(x)\n        return x\n\n    def predict_with_default(self, x):\n        \"\"\"Run prediction, return zeros if batch is empty.\"\"\"\n        if x.size(0) == 0:\n            return torch.zeros(0, self.num_classes)  # BUG: no device specified\n        logits = self.forward(x)\n        return F.softmax(logits, dim=1)\n\n\nclass Trainer:\n    def __init__(self, model, optimizer):\n        self.model = model\n        self.optimizer = optimizer\n",
+  "gold_issues": [
+    {
+      "file": "model.py",
+      "line": 28,
+      "severity": "critical",
+      "category": "bug",
+      "description": "Tensor shape mismatch: nn.Linear(512, 128) expects 512 input features but the preceding AdaptiveAvgPool2d((2,2)) with 64 channels produces 64*2*2=256 features. Will crash with RuntimeError at forward pass."
+    },
+    {
+      "file": "model.py",
+      "line": 45,
+      "severity": "high",
+      "category": "bug",
+      "description": "Device placement bug: torch.zeros() defaults to CPU but model may be on GPU. Should use device=x.device to match the input tensor's device."
+    }
+  ],
+  "gold_summary_keywords": ["shape mismatch", "Linear", "512", "256", "device", "GPU", "CPU", "tensor"],
+  "should_approve": false
+}

@@ -1,0 +1,6 @@
+# OpenEnv Code Review Agent — Dependencies
+pydantic>=2.0.0
+openai>=1.0.0
+gradio>=4.0.0
+pytest>=7.0.0
+python-dotenv>=1.0.0
