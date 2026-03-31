@@ -4,9 +4,7 @@ Fetches PR data, changed files, and posts review comments.
 """
 
 import httpx
-import hashlib
-import hmac
-from typing import Optional, List, Dict, Any
+from typing import List
 from config import get_settings
 from services.cache_service import CacheService
 

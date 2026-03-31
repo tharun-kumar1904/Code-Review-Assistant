@@ -5,13 +5,11 @@ Insights router — repository insights & security issues.
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
-from sqlalchemy.orm import selectinload
 from database import get_db
 from models import (
     Repository, PullRequest, ReviewResult,
-    SecurityIssue, CodeMetrics, ReviewComment, Severity,
+    SecurityIssue, CodeMetrics, ReviewComment,
 )
-from schemas import SecurityIssueResponse, RepositoryInsightsResponse
 from typing import Optional
 
 router = APIRouter()

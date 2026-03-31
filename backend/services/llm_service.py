@@ -4,7 +4,7 @@ Supports OpenAI, Claude, and Gemini for code analysis.
 """
 
 import json
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from config import get_settings
 
 settings = get_settings()
@@ -201,8 +201,8 @@ class LLMService:
             severity_counts[sev] = severity_counts.get(sev, 0) + 1
 
         summary_lines = [
-            f"## Code Review Summary",
-            f"",
+            "## Code Review Summary",
+            "",
             f"**Total issues found:** {len(issues)}",
         ]
 

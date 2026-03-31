@@ -3,7 +3,7 @@ RAG (Retrieval Augmented Generation) service.
 Embeds repository code and retrieves relevant context for PR analysis.
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from config import get_settings
 
 settings = get_settings()

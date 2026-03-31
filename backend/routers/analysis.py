@@ -7,10 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc, func
 from sqlalchemy.orm import selectinload
 from database import get_db
-from models import PullRequest, ReviewResult, ReviewComment, Repository, PRStatus
+from models import PullRequest, ReviewResult, Repository, PRStatus
 from schemas import (
     AnalyzePRRequest, AnalysisTaskResponse,
-    ReviewResultResponse, PullRequestResponse,
+    ReviewResultResponse,
 )
 from typing import Optional
 import uuid
@@ -68,7 +68,6 @@ async def analyze_pull_request(
     # Enqueue Celery task
     task_id = str(uuid.uuid4())
     try:
-        from workers.celery_app import celery
         from workers.tasks import analyze_pull_request_task
         analyze_pull_request_task.apply_async(
             args=[request.repo_owner, request.repo_name, request.pr_number],

@@ -148,7 +148,7 @@ class StaticAnalyzer:
 
     def _extract_chunks(self, content: str, chunk_size: int = 3) -> List[str]:
         """Extract overlapping chunks of lines for duplication detection."""
-        lines = [l.strip() for l in content.split('\n') if l.strip()]
+        lines = [line.strip() for line in content.split('\n') if line.strip()]
         chunks = []
         for i in range(len(lines) - chunk_size + 1):
             chunk = '\n'.join(lines[i:i + chunk_size])

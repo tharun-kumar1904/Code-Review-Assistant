@@ -3,7 +3,7 @@ SQLAlchemy ORM models for the AI Code Review Assistant.
 """
 
 from sqlalchemy import (
-    Column, Integer, String, Text, Float, DateTime, ForeignKey, Enum, JSON
+    Column, Integer, String, Text, Float, DateTime, ForeignKey, Enum
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
