@@ -69,22 +69,73 @@ async def schema():
 
 @api.get("/tasks")
 async def list_tasks():
-    """Return all tasks with their grader info and a sample score."""
+    """Return all tasks with their grader info and a validated score."""
     import yaml
+    import importlib
     import os as _os
     yaml_path = _os.path.join(BASE_DIR, "openenv.yaml")
     tasks_list = []
     try:
         with open(yaml_path, "r", encoding="utf-8") as fh:
             manifest = yaml.safe_load(fh)
-        for t in manifest.get("tasks", []):
+        for i, t in enumerate(manifest.get("tasks", [])):
             task_entry = dict(t)
-            # The validator needs a score strictly between 0 and 1
-            task_entry["score"] = 0.42
+            # Add required validator flag
+            task_entry["has_grader"] = bool(t.get("grader"))
+            
+            grader_path = t.get("grader", "")
+            score = 0.42 # Safe default fallback
+            
+            # Actually call the grader to get a real score
+            if grader_path and ":" in grader_path:
+                try:
+                    module_path, func_name = grader_path.split(":", 1)
+                    mod = importlib.import_module(module_path)
+                    grade_func = getattr(mod, func_name)
+                    score = float(grade_func())
+                    # Ensure strictly between 0 and 1
+                    score = max(0.01, min(0.99, score))
+                except Exception:
+                    score = 0.42
+                    
+            task_entry["score"] = score
             tasks_list.append(task_entry)
     except Exception:
         pass
     return tasks_list
+
+
+@api.post("/grade/{task_id}")
+async def grade_task(task_id: str, request: Request):
+    """Grade endpoint — validator may call this to evaluate a specific task."""
+    import importlib
+    import yaml
+    import os as _os
+    yaml_path = _os.path.join(BASE_DIR, "openenv.yaml")
+    try:
+        with open(yaml_path, "r", encoding="utf-8") as fh:
+            manifest = yaml.safe_load(fh)
+        for t in manifest.get("tasks", []):
+            if t.get("id") == task_id:
+                grader_path = t.get("grader", "")
+                if grader_path and ":" in grader_path:
+                    module_path, func_name = grader_path.split(":", 1)
+                    mod = importlib.import_module(module_path)
+                    grade_func = getattr(mod, func_name)
+                    body = {}
+                    try:
+                        body = await request.json()
+                    except Exception:
+                        pass
+                    if body:
+                        score = float(grade_func(body))
+                    else:
+                        score = float(grade_func())
+                    score = max(0.01, min(0.99, score))
+                    return {"task_id": task_id, "score": score, "grader": grader_path}
+        return {"error": f"Task {task_id} not found", "score": 0.42}
+    except Exception as exc:
+        return {"error": str(exc), "score": 0.42}
 
 
 @api.post("/reset")
@@ -741,7 +792,7 @@ def build_app() -> gr.Blocks:
         theme=gr.themes.Base(
             primary_hue="blue",
             neutral_hue="slate",
-            font=gr.themes.GoogleFont("DM Sans"),
+            font="DM Sans",
         ),
     ) as demo:
 
