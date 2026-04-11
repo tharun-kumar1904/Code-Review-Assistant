@@ -1,0 +1,20 @@
+{
+  "task_id": "task_009_path_traversal",
+  "title": "Path traversal in file download endpoint",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds file download endpoint for user uploads.",
+  "diff": "--- a/files.py\n+++ b/files.py\n@@ -7,6 +7,12 @@ import os\n \n UPLOAD_DIR = '/var/uploads'\n \n+def download_file(filename):\n+    filepath = os.path.join(UPLOAD_DIR, filename)\n+    with open(filepath, 'rb') as f:\n+        return f.read()\n",
+  "file_context": "import os\n\nUPLOAD_DIR = '/var/uploads'\n\ndef download_file(filename):\n    filepath = os.path.join(UPLOAD_DIR, filename)\n    with open(filepath, 'rb') as f:\n        return f.read()\n",
+  "gold_issues": [
+    {
+      "file": "files.py",
+      "line": 11,
+      "severity": "critical",
+      "category": "security",
+      "description": "Path traversal: unsanitized filename allows reading arbitrary files (e.g. ../../etc/passwd)."
+    }
+  ],
+  "gold_summary_keywords": ["path traversal", "sanitize", "filename", "arbitrary files"],
+  "should_approve": false
+}

@@ -1,0 +1,20 @@
+{
+  "task_id": "task_010_memory_leak",
+  "title": "Unbounded list causes memory leak",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds event caching for analytics pipeline.",
+  "diff": "--- a/events.py\n+++ b/events.py\n@@ -1,5 +1,8 @@\n+event_cache = []\n+\n+def record_event(event):\n+    event_cache.append(event)\n",
+  "file_context": "event_cache = []\n\ndef record_event(event):\n    event_cache.append(event)\n",
+  "gold_issues": [
+    {
+      "file": "events.py",
+      "line": 5,
+      "severity": "high",
+      "category": "bug",
+      "description": "Unbounded event_cache list grows forever with no eviction, causing OOM under sustained traffic."
+    }
+  ],
+  "gold_summary_keywords": ["memory leak", "unbounded", "OOM", "deque", "maxlen"],
+  "should_approve": false
+}

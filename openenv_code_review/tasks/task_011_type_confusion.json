@@ -1,0 +1,20 @@
+{
+  "task_id": "task_011_type_confusion",
+  "title": "String parameters used in arithmetic",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds dynamic pricing calculation.",
+  "diff": "--- a/pricing.py\n+++ b/pricing.py\n@@ -6,6 +6,12 @@ TAX_RATE = 0.08\n \n def calculate_price(base_price, discount):\n+    final = base_price - discount\n+    return final * (1 + TAX_RATE)\n",
+  "file_context": "TAX_RATE = 0.08\n\ndef calculate_price(base_price, discount):\n    final = base_price - discount\n    return final * (1 + TAX_RATE)\n",
+  "gold_issues": [
+    {
+      "file": "pricing.py",
+      "line": 10,
+      "severity": "high",
+      "category": "bug",
+      "description": "No type validation: if base_price or discount are strings, subtraction raises TypeError at runtime."
+    }
+  ],
+  "gold_summary_keywords": ["TypeError", "type", "string", "float", "cast"],
+  "should_approve": false
+}

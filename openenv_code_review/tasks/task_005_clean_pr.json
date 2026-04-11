@@ -1,0 +1,12 @@
+{
+  "task_id": "task_005_clean_pr",
+  "title": "Clean PR — well-structured utility function",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds a safe average utility with edge-case handling.",
+  "diff": "--- a/utils.py\n+++ b/utils.py\n@@ -0,0 +1,8 @@\n+def safe_average(values):\n+    \"\"\"Return mean of values, or 0.0 for empty input.\"\"\"\n+    if not values:\n+        return 0.0\n+    return sum(values) / len(values)\n",
+  "file_context": "def safe_average(values):\n    \"\"\"Return mean of values, or 0.0 for empty input.\"\"\"\n    if not values:\n        return 0.0\n    return sum(values) / len(values)\n",
+  "gold_issues": [],
+  "gold_summary_keywords": ["clean", "edge case", "empty"],
+  "should_approve": true
+}

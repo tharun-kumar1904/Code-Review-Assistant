@@ -1,0 +1,20 @@
+{
+  "task_id": "task_008_n_plus_one",
+  "title": "N+1 query in user order listing",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds order summary to user list view.",
+  "diff": "--- a/views.py\n+++ b/views.py\n@@ -8,8 +8,14 @@ from models import User\n \n def user_order_summary():\n+    users = User.query.all()\n+    result = []\n+    for user in users:\n+        orders = Order.query.filter_by(user_id=user.id).all()\n+        result.append({'user': user.name, 'order_count': len(orders)})\n+    return result\n",
+  "file_context": "from models import User, Order\n\ndef user_order_summary():\n    users = User.query.all()\n    result = []\n    for user in users:\n        orders = Order.query.filter_by(user_id=user.id).all()\n        result.append({'user': user.name, 'order_count': len(orders)})\n    return result\n",
+  "gold_issues": [
+    {
+      "file": "views.py",
+      "line": 12,
+      "severity": "high",
+      "category": "performance",
+      "description": "N+1 query: one DB query per user to fetch orders. 1000 users = 1001 queries. Use eager loading."
+    }
+  ],
+  "gold_summary_keywords": ["N+1", "query", "eager loading", "performance", "joinedload"],
+  "should_approve": false
+}

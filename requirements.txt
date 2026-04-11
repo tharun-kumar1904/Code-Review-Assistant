@@ -1,0 +1,22 @@
+# Web framework & serving
+fastapi>=0.111.0
+uvicorn>=0.30.0
+python-multipart>=0.0.9
+
+# Gradio — use latest stable (no websockets conflict)
+gradio>=5.0.0
+huggingface_hub>=0.23.4
+
+# Pydantic v2
+pydantic>=2.0.0
+
+# LLM backend
+openai>=1.30.0
+
+# OpenEnv framework
+openenv-core>=0.2.0
+
+# Utilities
+python-dotenv>=1.0.0
+numpy>=1.26.0
+pyyaml>=6.0

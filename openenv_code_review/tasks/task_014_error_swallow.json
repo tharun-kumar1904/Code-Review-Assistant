@@ -1,0 +1,27 @@
+{
+  "task_id": "task_014_error_swallow",
+  "title": "Silent error swallowing in retry logic",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds retry logic to external API client.",
+  "diff": "--- a/api_client.py\n+++ b/api_client.py\n@@ -4,10 +4,16 @@ import requests\n \n def fetch_data(url, retries=3):\n+    for attempt in range(retries):\n+        try:\n+            return requests.get(url).json()\n+        except:\n+            pass\n+    return None\n",
+  "file_context": "import requests\n\ndef fetch_data(url, retries=3):\n    for attempt in range(retries):\n        try:\n            return requests.get(url).json()\n        except:\n            pass\n    return None\n",
+  "gold_issues": [
+    {
+      "file": "api_client.py",
+      "line": 8,
+      "severity": "medium",
+      "category": "error_handling",
+      "description": "Bare except swallows all exceptions including KeyboardInterrupt. Errors are never logged."
+    },
+    {
+      "file": "api_client.py",
+      "line": 10,
+      "severity": "medium",
+      "category": "bug",
+      "description": "Silent None return after all retries causes NoneType errors in callers with no indication of failure."
+    }
+  ],
+  "gold_summary_keywords": ["bare except", "silent", "None", "retry", "error handling"],
+  "should_approve": false
+}

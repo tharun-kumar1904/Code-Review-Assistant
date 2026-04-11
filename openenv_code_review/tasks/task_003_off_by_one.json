@@ -1,0 +1,27 @@
+{
+  "task_id": "task_003_off_by_one",
+  "title": "Off-by-one error and bare except",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds batch processing for items list.",
+  "diff": "--- a/processor.py\n+++ b/processor.py\n@@ -30,8 +30,14 @@ def process_items(items):\n+    results = []\n+    for i in range(1, len(items)):\n+        try:\n+            results.append(transform(items[i]))\n+        except:\n+            pass\n+    return results\n",
+  "file_context": "def process_items(items):\n    results = []\n    for i in range(1, len(items)):\n        try:\n            results.append(transform(items[i]))\n        except:\n            pass\n    return results\n",
+  "gold_issues": [
+    {
+      "file": "processor.py",
+      "line": 34,
+      "severity": "high",
+      "category": "bug",
+      "description": "range(1, len(items)) skips index 0 — the first item is never processed."
+    },
+    {
+      "file": "processor.py",
+      "line": 42,
+      "severity": "medium",
+      "category": "error_handling",
+      "description": "Bare except catches SystemExit and KeyboardInterrupt, masking real errors."
+    }
+  ],
+  "gold_summary_keywords": ["off-by-one", "range", "bare except", "index 0"],
+  "should_approve": false
+}

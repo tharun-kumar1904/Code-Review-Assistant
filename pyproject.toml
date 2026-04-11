@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openenv_code_review"
+version = "0.1.0"
+description = "Code Review Assistant OpenEnv Agent"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.111.0",
+    "uvicorn>=0.30.0",
+    "python-multipart>=0.0.9",
+    "pydantic>=2.0.0",
+    "openai>=1.30.0",
+    "python-dotenv>=1.0.0",
+    "numpy>=1.26.0",
+    "pyyaml>=6.0",
+    "openenv-core>=0.2.0",
+]
+
+[project.scripts]
+server = "server.app:main"
+
+[tool.setuptools.packages.find]
+include = ["openenv_code_review*", "tasks*", "server*"]
+
+[tool.setuptools.package-data]
+openenv_code_review = ["tasks/*.json"]
+tasks = ["**/grader.py", "**/__init__.py"]

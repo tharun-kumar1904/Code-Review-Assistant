@@ -1,0 +1,12 @@
+{
+  "task_id": "task_012_clean_refactor",
+  "title": "Clean async context manager refactor",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Refactors DB transaction handling to use async context manager.",
+  "diff": "--- a/db.py\n+++ b/db.py\n@@ -0,0 +1,14 @@\n+from contextlib import asynccontextmanager\n+\n+@asynccontextmanager\n+async def transaction(conn):\n+    async with conn.begin():\n+        try:\n+            yield conn\n+            await conn.commit()\n+        except Exception:\n+            await conn.rollback()\n+            raise\n",
+  "file_context": "from contextlib import asynccontextmanager\n\n@asynccontextmanager\nasync def transaction(conn):\n    async with conn.begin():\n        try:\n            yield conn\n            await conn.commit()\n        except Exception:\n            await conn.rollback()\n            raise\n",
+  "gold_issues": [],
+  "gold_summary_keywords": ["context manager", "commit", "rollback", "async"],
+  "should_approve": true
+}

@@ -1,0 +1,58 @@
+"""Grader for task_001_null_check — Missing null/None check on user object."""
+
+GOLD = {
+    "bugs": ["null", "none", "nonetype", "attributeerror", "null check", "none check"],
+    "verdict": "request_changes",
+    "min_issues": 1,
+}
+
+
+def _score_action(action, gold=None):
+    """Self-contained 3-component scoring. No external imports needed."""
+    if gold is None:
+        gold = GOLD
+
+    bugs = gold.get("bugs", [])
+    verdict = gold.get("verdict", "request_changes")
+    action_str = str(action).lower()
+
+    # Component 1: Verdict match (0.0-0.40)
+    verdict_score = 0.0
+    if verdict == "request_changes":
+        if "request_changes" in action_str or "false" in action_str or "reject" in action_str:
+            verdict_score = 0.40
+        elif "approve" not in action_str:
+            verdict_score = 0.20
+    elif verdict == "approve":
+        if "approve" in action_str or "true" in action_str:
+            verdict_score = 0.40
+        elif "request_changes" not in action_str:
+            verdict_score = 0.20
+
+    # Component 2: Bug coverage (0.0-0.40)
+    bug_hits = sum(1 for b in bugs if b in action_str)
+    bug_score = 0.40 * (bug_hits / max(len(bugs), 1))
+
+    # Component 3: Actionability (0.0-0.20)
+    action_score = 0.0
+    actionable_words = ["fix", "add", "check", "use", "replace", "remove", "change", "handle", "validate"]
+    hits = sum(1 for w in actionable_words if w in action_str)
+    action_score = 0.20 * min(1.0, hits / 3.0)
+
+    raw = verdict_score + bug_score + action_score
+    return max(0.01, min(0.99, raw))
+
+
+def grade(*args, **kwargs) -> float:
+    """OpenEnv grader entry point. Returns float strictly in (0, 1)."""
+    if not args and not kwargs:
+        return 0.42
+
+    action = kwargs.get("action", args[0] if len(args) >= 1 else "")
+    gold = kwargs.get("gold", args[1] if len(args) >= 2 else GOLD)
+
+    try:
+        score = _score_action(action, gold if isinstance(gold, dict) else GOLD)
+        return max(0.01, min(0.99, float(score)))
+    except Exception:
+        return 0.42

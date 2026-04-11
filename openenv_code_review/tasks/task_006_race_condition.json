@@ -1,0 +1,20 @@
+{
+  "task_id": "task_006_race_condition",
+  "title": "Race condition in async counter",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds request count tracking to the analytics module.",
+  "diff": "--- a/analytics.py\n+++ b/analytics.py\n@@ -5,5 +5,10 @@ import asyncio\n \n request_count = 0\n \n+async def track_request():\n+    global request_count\n+    request_count += 1\n",
+  "file_context": "import asyncio\n\nrequest_count = 0\n\nasync def track_request():\n    global request_count\n    request_count += 1\n",
+  "gold_issues": [
+    {
+      "file": "analytics.py",
+      "line": 9,
+      "severity": "high",
+      "category": "bug",
+      "description": "Race condition: request_count += 1 is not atomic in async context. Concurrent calls cause lost updates."
+    }
+  ],
+  "gold_summary_keywords": ["race condition", "atomic", "async", "lock", "concurrent"],
+  "should_approve": false
+}

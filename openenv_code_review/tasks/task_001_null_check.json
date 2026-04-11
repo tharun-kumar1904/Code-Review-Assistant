@@ -1,0 +1,20 @@
+{
+  "task_id": "task_001_null_check",
+  "title": "Null check missing on user object",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Refactors user profile endpoint to return richer data.",
+  "diff": "--- a/app.py\n+++ b/app.py\n@@ -10,6 +10,10 @@ from models import get_user\n \n def get_profile(user_id):\n+    user = get_user(user_id)\n+    return {\n+        'name': user.name,\n+        'email': user.email,\n+    }\n",
+  "file_context": "from models import get_user\n\ndef get_profile(user_id):\n    user = get_user(user_id)\n    return {'name': user.name, 'email': user.email}\n",
+  "gold_issues": [
+    {
+      "file": "app.py",
+      "line": 15,
+      "severity": "high",
+      "category": "bug",
+      "description": "Missing null check: get_user() may return None, causing AttributeError on user.name"
+    }
+  ],
+  "gold_summary_keywords": ["null", "None", "AttributeError", "get_user"],
+  "should_approve": false
+}

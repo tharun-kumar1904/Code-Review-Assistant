@@ -1,0 +1,12 @@
+{
+  "task_id": "task_015_clean_logging",
+  "title": "Clean structured JSON logging implementation",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds structured JSON logging with correlation IDs for production observability.",
+  "diff": "--- a/logging_utils.py\n+++ b/logging_utils.py\n@@ -0,0 +1,22 @@\n+import json\n+import logging\n+import traceback\n+from datetime import datetime\n+\n+def log_event(level, message, correlation_id=None, **kwargs):\n+    entry = {\n+        'timestamp': datetime.utcnow().isoformat(),\n+        'level': level,\n+        'message': message,\n+        'correlation_id': correlation_id,\n+        **kwargs,\n+    }\n+    if 'exc_info' in kwargs:\n+        entry['traceback'] = traceback.format_exc()\n+    print(json.dumps(entry))\n",
+  "file_context": "import json\nimport logging\nimport traceback\nfrom datetime import datetime\n\ndef log_event(level, message, correlation_id=None, **kwargs):\n    entry = {\n        'timestamp': datetime.utcnow().isoformat(),\n        'level': level,\n        'message': message,\n        'correlation_id': correlation_id,\n        **kwargs,\n    }\n    if 'exc_info' in kwargs:\n        entry['traceback'] = traceback.format_exc()\n    print(json.dumps(entry))\n",
+  "gold_issues": [],
+  "gold_summary_keywords": ["structured", "JSON", "correlation", "logging", "timestamp"],
+  "should_approve": true
+}

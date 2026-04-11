@@ -1,0 +1,20 @@
+{
+  "task_id": "task_002_sql_inject",
+  "title": "SQL injection via f-string interpolation",
+  "language": "python",
+  "author": "contributor",
+  "pr_description": "Adds login lookup by username.",
+  "diff": "--- a/db.py\n+++ b/db.py\n@@ -20,4 +20,6 @@ import sqlite3\n \n def find_user(username):\n+    query = f\"SELECT * FROM users WHERE username = '{username}'\"\n+    cursor.execute(query)\n+    return cursor.fetchone()\n",
+  "file_context": "import sqlite3\n\ndef find_user(username):\n    query = f\"SELECT * FROM users WHERE username = '{username}'\"\n    cursor.execute(query)\n    return cursor.fetchone()\n",
+  "gold_issues": [
+    {
+      "file": "db.py",
+      "line": 23,
+      "severity": "critical",
+      "category": "security",
+      "description": "SQL injection: user input interpolated directly into SQL via f-string. Use parameterized queries."
+    }
+  ],
+  "gold_summary_keywords": ["SQL injection", "parameterized", "f-string", "security"],
+  "should_approve": false
+}
